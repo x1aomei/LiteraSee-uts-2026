@@ -1,0 +1,53 @@
+# ============================================
+# LARAVEL (literasee-backend)
+# ============================================
+literasee-backend/vendor/
+literasee-backend/node_modules/
+literasee-backend/.env
+literasee-backend/.env.backup
+literasee-backend/.env.production
+literasee-backend/storage/*.key
+literasee-backend/storage/logs/*.log
+literasee-backend/storage/framework/cache/*
+literasee-backend/storage/framework/sessions/*
+literasee-backend/storage/framework/views/*
+literasee-backend/bootstrap/cache/*.php
+literasee-backend/public/storage
+literasee-backend/public/build
+literasee-backend/public/hot
+literasee-backend/.phpunit.cache
+literasee-backend/.phpunit.result.cache
+literasee-backend/test_midtrans.php
+literasee-backend/test_snap.php
+
+# ============================================
+# VUE (literasee-frontend)
+# ============================================
+literasee-frontend/node_modules/
+literasee-frontend/.env
+literasee-frontend/.env.local
+literasee-frontend/.env.production
+literasee-frontend/dist/
+literasee-frontend/.vite/
+literasee-frontend/coverage/
+literasee-frontend/*.tsbuildinfo
+
+# ============================================
+# OS & IDE
+# ============================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ============================================
+# LOGS & CACHE
+# ============================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
