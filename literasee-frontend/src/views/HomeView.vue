@@ -25,15 +25,28 @@ onMounted(fetchHome);
 </script>
 
 <template>
-    <section class="bg-gradient-to-br from-primary-600 to-primary-800 text-white">
-        <div class="max-w-7xl mx-auto px-4 py-20">
-            <div class="grid md:grid-cols-2 gap-8 items-center">
-                <div>
-                    <h1 class="text-4xl md:text-5xl font-bold mb-6">Temukan Buku Favoritmu di LiteraSee</h1>
-                    <p class="text-lg text-primary-100 mb-8">Ribuan koleksi buku dari berbagai genre. Belanja mudah, harga bersahabat!</p>
-                    <RouterLink to="/catalog" class="bg-white text-primary-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition inline-block">Mulai Belanja</RouterLink>
-                </div>
-                <div class="hidden md:block text-center text-9xl">📚</div>
+    <!-- Section Hero dengan Latar Belakang Buku Modern -->
+    <section 
+        class="relative bg-cover bg-center text-white overflow-hidden"
+        style="background-image: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1920&auto=format&fit=crop');"
+    >
+        <!-- Overlay Gradien Kebiruan agar Teks Jelas Dibaca -->
+        <div class="absolute inset-0 bg-gradient-to-r from-primary-900/95 via-primary-800/85 to-primary-950/70"></div>
+
+        <div class="relative max-w-7xl mx-auto px-4 py-24 md:py-32">
+            <div class="max-w-2xl">
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-6 leading-tight drop-shadow-lg">
+                    Temukan Buku Favoritmu di LiteraSee
+                </h1>
+                <p class="text-lg md:text-xl text-primary-100 mb-8 drop-shadow">
+                    Ribuan koleksi buku dari berbagai genre. Belanja mudah, harga bersahabat!
+                </p>
+                <RouterLink 
+                    to="/catalog" 
+                    class="bg-white text-primary-700 px-8 py-3.5 rounded-lg font-bold shadow-lg hover:bg-gray-100 hover:shadow-xl transition inline-block transform hover:-translate-y-0.5"
+                >
+                    Mulai Belanja
+                </RouterLink>
             </div>
         </div>
     </section>
@@ -71,7 +84,7 @@ onMounted(fetchHome);
                 <BookCard v-for="book in featuredBooks" :key="book.id" :book="book" />
             </div>
         </section>
-
+        
         <section class="bg-white py-12">
             <div class="max-w-7xl mx-auto px-4">
                 <div class="flex items-center justify-between mb-6">
