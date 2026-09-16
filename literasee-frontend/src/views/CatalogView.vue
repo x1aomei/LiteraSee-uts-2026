@@ -74,85 +74,125 @@ onMounted(fetchCatalog);
 </script>
 
 <template>
-    <div class="max-w-7xl mx-auto px-4 py-8">
-        <div class="grid lg:grid-cols-4 gap-8">
-            <aside class="lg:col-span-1">
-                <div class="card p-4 sticky top-20">
-                    <h3 class="font-bold mb-4">🔍 Filter</h3>
+    <!-- Wrapper Utama dengan background Beige (#F2ECE4) dan teks Cokelat Soft (#3B2E26) -->
+    <div class="bg-[#F2ECE4] text-[#3B2E26] min-h-screen py-10">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+                
+                <!-- Sidebar Filter -->
+                <aside class="lg:col-span-1">
+                    <div class="bg-white border-2 border-[#D4C5B9] p-6 sticky top-20 shadow-sm">
+                        <h3 class="font-black text-lg mb-4 text-[#3B2E26] pb-2 border-b-2 border-[#D4C5B9] flex items-center gap-2">
+                            <span>🔍</span> Filter Katalog
+                        </h3>
 
-                    <div class="mb-6">
-                        <h4 class="text-sm font-semibold mb-2">Kategori</h4>
-                        <label class="flex items-center gap-2 cursor-pointer mb-1">
-                            <input type="radio" v-model="filters.category" value="" @change="applyFilters" class="text-primary-600" />
-                            <span class="text-sm">Semua</span>
-                        </label>
-                        <label v-for="cat in categories" :key="cat.id" class="flex items-center gap-2 cursor-pointer mb-1">
-                            <input type="radio" v-model="filters.category" :value="cat.slug" @change="applyFilters" class="text-primary-600" />
-                            <span class="text-sm">{{ cat.name }}</span>
-                            <span class="text-xs text-gray-400">({{ cat.active_books_count }})</span>
-                        </label>
-                    </div>
-
-                    <div class="mb-6">
-                        <h4 class="text-sm font-semibold mb-2">Rentang Harga</h4>
-                        <div class="grid grid-cols-2 gap-2 mb-2">
-                            <input v-model="filters.min_price" type="number" placeholder="Min" class="input text-sm py-1.5" />
-                            <input v-model="filters.max_price" type="number" placeholder="Max" class="input text-sm py-1.5" />
+                        <!-- Kategori -->
+                        <div class="mb-6">
+                            <h4 class="text-xs font-black tracking-widest text-[#5C4A3F] uppercase mb-3">Kategori</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" v-model="filters.category" value="" @change="applyFilters" class="text-[#5C4A3F] focus:ring-[#5C4A3F]" />
+                                    <span class="text-sm font-medium">Semua</span>
+                                </label>
+                                <label v-for="cat in categories" :key="cat.id" class="flex items-center justify-between cursor-pointer">
+                                    <div class="flex items-center gap-2">
+                                        <input type="radio" v-model="filters.category" :value="cat.slug" @change="applyFilters" class="text-[#5C4A3F] focus:ring-[#5C4A3F]" />
+                                        <span class="text-sm font-medium">{{ cat.name }}</span>
+                                    </div>
+                                    <span class="text-xs text-[#8C7A6B] font-bold">({{ cat.active_books_count }})</span>
+                                </label>
+                            </div>
                         </div>
-                        <button @click="applyFilters" class="btn-primary w-full text-sm py-1.5">Terapkan</button>
+
+                        <hr class="border-[#D4C5B9] my-4" />
+
+                        <!-- Rentang Harga -->
+                        <div class="mb-6">
+                            <h4 class="text-xs font-black tracking-widest text-[#5C4A3F] uppercase mb-3">Rentang Harga</h4>
+                            <div class="grid grid-cols-2 gap-2 mb-3">
+                                <input v-model="filters.min_price" type="number" placeholder="Min" class="bg-[#FAF7F2] border border-[#D4C5B9] text-[#3B2E26] text-sm py-2 px-3 focus:outline-none focus:border-[#5C4A3F]" />
+                                <input v-model="filters.max_price" type="number" placeholder="Max" class="bg-[#FAF7F2] border border-[#D4C5B9] text-[#3B2E26] text-sm py-2 px-3 focus:outline-none focus:border-[#5C4A3F]" />
+                            </div>
+                            <button @click="applyFilters" class="w-full bg-[#5C4A3F] text-white text-xs font-bold tracking-widest uppercase py-2.5 hover:bg-[#3B2E26] transition shadow-sm">
+                                Terapkan Harga
+                            </button>
+                        </div>
+
+                        <hr class="border-[#D4C5B9] my-4" />
+
+                        <!-- Bahasa -->
+                        <div class="mb-6">
+                            <h4 class="text-xs font-black tracking-widest text-[#5C4A3F] uppercase mb-3">Bahasa</h4>
+                            <select v-model="filters.language" @change="applyFilters" class="w-full bg-[#FAF7F2] border border-[#D4C5B9] text-[#3B2E26] text-sm py-2 px-3 focus:outline-none focus:border-[#5C4A3F]">
+                                <option value="">Semua Bahasa</option>
+                                <option v-for="lang in languages" :key="lang" :value="lang">{{ lang }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Sedang Diskon -->
+                        <div class="mb-6 bg-[#FAF7F2] p-3 border border-[#D4C5B9]">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" v-model="filters.on_sale" @change="applyFilters" class="text-[#5C4A3F] focus:ring-[#5C4A3F] rounded" />
+                                <span class="text-sm font-bold text-[#3B2E26]">🔥 Sedang Diskon</span>
+                            </label>
+                        </div>
+
+                        <button @click="resetFilters" class="w-full bg-transparent border-2 border-[#5C4A3F] text-[#5C4A3F] text-xs font-bold tracking-widest uppercase py-2.5 hover:bg-[#5C4A3F] hover:text-white transition">
+                            Reset Filter
+                        </button>
+                    </div>
+                </aside>
+
+                <!-- Konten Utama Katalog -->
+                <main class="lg:col-span-3">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-8 bg-white p-6 border-2 border-[#D4C5B9] shadow-sm">
+                        <div>
+                            <h1 class="text-2xl md:text-3xl font-black text-[#3B2E26] uppercase tracking-wide">
+                                {{ filters.category ? categories.find(c => c.slug === filters.category)?.name : 'Semua Buku' }}
+                            </h1>
+                            <p class="text-xs font-bold tracking-widest text-[#8C7A6B] mt-1">{{ pagination.total }} BUKU DITEMUKAN</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold uppercase tracking-widest text-[#5C4A3F]">Urutkan:</span>
+                            <select v-model="filters.sort" @change="applyFilters" class="bg-[#FAF7F2] border border-[#D4C5B9] text-[#3B2E26] text-sm py-2 px-3 focus:outline-none focus:border-[#5C4A3F]">
+                                <option value="newest">Terbaru</option>
+                                <option value="oldest">Terlama</option>
+                                <option value="price_asc">Harga Terendah</option>
+                                <option value="price_desc">Harga Tertinggi</option>
+                                <option value="title_asc">Judul A-Z</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="mb-6">
-                        <h4 class="text-sm font-semibold mb-2">Bahasa</h4>
-                        <select v-model="filters.language" @change="applyFilters" class="input text-sm">
-                            <option value="">Semua Bahasa</option>
-                            <option v-for="lang in languages" :key="lang" :value="lang">{{ lang }}</option>
-                        </select>
+                    <LoadingSpinner v-if="loading" />
+
+                    <!-- Grid Buku -->
+                    <div v-else-if="books.length" class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                        <div 
+                            v-for="book in books" 
+                            :key="book.id" 
+                            class="bg-[#FAF7F2] p-4 border border-[#D4C5B9] hover:border-[#5C4A3F] hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+                        >
+                            <BookCard :book="book" />
+                        </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" v-model="filters.on_sale" @change="applyFilters" class="text-primary-600" />
-                            <span class="text-sm">Sedang Diskon</span>
-                        </label>
+                    <!-- Kosong / Tidak Ditemukan -->
+                    <div v-else class="bg-white border-2 border-[#D4C5B9] p-12 text-center shadow-sm">
+                        <div class="text-6xl mb-4">📖</div>
+                        <h3 class="text-lg font-bold mb-2 text-[#3B2E26]">Buku Tidak Ditemukan</h3>
+                        <p class="text-sm text-[#8C7A6B] mb-6">Coba ubah kata kunci pencarian atau sesuaikan kembali filter pilihanmu.</p>
+                        <button @click="resetFilters" class="bg-[#5C4A3F] text-white text-xs font-bold tracking-widest uppercase px-6 py-3 hover:bg-[#3B2E26] transition shadow-sm">
+                            Reset Filter
+                        </button>
                     </div>
 
-                    <button @click="resetFilters" class="btn-outline w-full text-sm">Reset Filter</button>
-                </div>
-            </aside>
-
-            <main class="lg:col-span-3">
-                <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
-                    <div>
-                        <h1 class="text-2xl font-bold">
-                            {{ filters.category ? categories.find(c => c.slug === filters.category)?.name : 'Semua Buku' }}
-                        </h1>
-                        <p class="text-sm text-gray-500">{{ pagination.total }} buku ditemukan</p>
+                    <!-- Pagination -->
+                    <div class="mt-8">
+                        <Pagination :current-page="pagination.currentPage" :last-page="pagination.lastPage" @change="changePage" />
                     </div>
-                    <select v-model="filters.sort" @change="applyFilters" class="input w-auto text-sm">
-                        <option value="newest">Terbaru</option>
-                        <option value="oldest">Terlama</option>
-                        <option value="price_asc">Harga Terendah</option>
-                        <option value="price_desc">Harga Tertinggi</option>
-                        <option value="title_asc">Judul A-Z</option>
-                    </select>
-                </div>
-
-                <LoadingSpinner v-if="loading" />
-
-                <div v-else-if="books.length" class="grid grid-cols-2 md:grid-cols-3 gap-6">
-                    <BookCard v-for="book in books" :key="book.id" :book="book" />
-                </div>
-
-                <div v-else class="card p-12 text-center">
-                    <div class="text-6xl mb-4">🔍</div>
-                    <h3 class="text-lg font-semibold mb-2">Buku tidak ditemukan</h3>
-                    <p class="text-gray-500 mb-4">Coba ubah filter atau kata kunci</p>
-                    <button @click="resetFilters" class="btn-primary">Reset Filter</button>
-                </div>
-
-                <Pagination :current-page="pagination.currentPage" :last-page="pagination.lastPage" @change="changePage" />
-            </main>
+                </main>
+            </div>
         </div>
     </div>
 </template>
