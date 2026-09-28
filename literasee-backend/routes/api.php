@@ -31,6 +31,12 @@ Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 
+    // ============================================
+    // GOOGLE OAUTH — PUBLIK (tidak butuh auth)
+    // ============================================
+    Route::get('/google', [AuthController::class, 'redirectToGoogle']);
+    Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -125,7 +131,6 @@ Route::middleware(['auth:sanctum', 'admin'])
         Route::get('/reports/export-sales', [AdminReportController::class, 'exportSales']);
 
         // ----- Users Management -----
-        // PENTING: /top-buyers HARUS di atas /{user} biar ngga dianggap ID
         Route::get('/users', [AdminUserController::class, 'index']);
         Route::get('/users/top-buyers', [AdminUserController::class, 'topBuyers']);
         Route::get('/users/{user}', [AdminUserController::class, 'show']);

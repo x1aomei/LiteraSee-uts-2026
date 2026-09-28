@@ -18,34 +18,53 @@ class CatalogController extends Controller
 
     /**
      * GET /api/home
+     *
+     * Cache 30 menit, tapi cache disimpan sebagai PLAIN ARRAY
+     * (bukan Eloquent Collection) supaya tidak corrupt.
      */
     public function home()
     {
-        $data = Cache::remember('homepage_data', 1800, function () {
+        $data = Cache::remember('homepage_data_v3', 1800, function () {
+            $categories = Category::active()
+                ->withCount(['activeBooks'])
+                ->having('active_books_count', '>', 0)
+                ->orderBy('name')
+                ->take(6)
+                ->get();
+
+            $featuredBooks = Book::with(['category:id,name', 'primaryImage'])
+                ->available()
+                ->featured()
+                ->whereHas('primaryImage')
+                ->latest()
+                ->take(8)
+                ->get();
+
+            $latestBooks = Book::with(['category:id,name', 'primaryImage'])
+                ->available()
+                ->whereHas('primaryImage')
+                ->latest()
+                ->take(8)
+                ->get();
+
+            $onSaleBooks = Book::with(['category:id,name', 'primaryImage'])
+                ->available()
+                ->onSale()
+                ->whereHas('primaryImage')
+                ->orderByRaw('(price - discount_price) / price DESC')
+                ->take(4)
+                ->get();
+
+            // ⚠️ ->resolve() ubah Resource jadi plain array — INI KUNCINYA
             return [
-                'categories' => Category::active()
-                    ->withCount(['activeBooks'])
-                    ->having('active_books_count', '>', 0)
-                    ->orderBy('name')
-                    ->take(6)
-                    ->get(),
-                'featured_books' => Book::with(['category:id,name', 'primaryImage'])
-                    ->available()->featured()->latest()->take(8)->get(),
-                'latest_books' => Book::with(['category:id,name', 'primaryImage'])
-                    ->available()->latest()->take(8)->get(),
-                'on_sale_books' => Book::with(['category:id,name', 'primaryImage'])
-                    ->available()->onSale()
-                    ->orderByRaw('(price - discount_price) / price DESC')
-                    ->take(4)->get(),
+                'categories'     => CategoryResource::collection($categories)->resolve(),
+                'featured_books' => BookResource::collection($featuredBooks)->resolve(),
+                'latest_books'   => BookResource::collection($latestBooks)->resolve(),
+                'on_sale_books'  => BookResource::collection($onSaleBooks)->resolve(),
             ];
         });
 
-        return $this->successResponse([
-            'categories' => CategoryResource::collection($data['categories']),
-            'featured_books' => BookResource::collection($data['featured_books']),
-            'latest_books' => BookResource::collection($data['latest_books']),
-            'on_sale_books' => BookResource::collection($data['on_sale_books']),
-        ]);
+        return $this->successResponse($data);
     }
 
     /**
@@ -75,9 +94,9 @@ class CatalogController extends Controller
         return $this->successResponse([
             'books' => BookResource::collection($books)->response()->getData(true),
             'filters' => [
-                'categories' => CategoryResource::collection($this->getCategories()),
+                'categories'  => CategoryResource::collection($this->getCategories()),
                 'price_range' => $this->getPriceRange(),
-                'languages' => $this->getLanguages(),
+                'languages'   => $this->getLanguages(),
             ],
         ]);
     }
@@ -97,16 +116,19 @@ class CatalogController extends Controller
             ->where('id', '!=', $book->id)
             ->available()
             ->inRandomOrder()
-            ->take(4)->get();
+            ->take(4)
+            ->get();
 
         $sameAuthorBooks = Book::with(['category:id,name', 'primaryImage'])
             ->where('author', $book->author)
             ->where('id', '!=', $book->id)
-            ->available()->take(4)->get();
+            ->available()
+            ->take(4)
+            ->get();
 
         return $this->successResponse([
-            'book' => new BookResource($book),
-            'related_books' => BookResource::collection($relatedBooks),
+            'book'              => new BookResource($book),
+            'related_books'     => BookResource::collection($relatedBooks),
             'same_author_books' => BookResource::collection($sameAuthorBooks),
         ]);
     }
@@ -116,31 +138,48 @@ class CatalogController extends Controller
      */
     public function categories()
     {
-        return $this->successResponse(CategoryResource::collection($this->getCategories()));
+        return $this->successResponse(
+            CategoryResource::collection($this->getCategories())
+        );
     }
+
+    // ============================================
+    // HELPER METHODS — SEMUA PAKAI CACHE + RESOLVE
+    // ============================================
 
     protected function getCategories()
     {
-        return Cache::remember('global_categories', 3600, function () {
-            return Category::active()
-                ->withCount(['activeBooks'])
-                ->having('active_books_count', '>', 0)
-                ->orderBy('name')->get();
-        });
+        return Category::active()
+            ->withCount(['activeBooks'])
+            ->having('active_books_count', '>', 0)
+            ->orderBy('name')
+            ->get();
     }
 
     protected function getPriceRange()
     {
-        return Cache::remember('book_price_range', 3600, function () {
-            $r = Book::available()->selectRaw('MIN(price) as min, MAX(price) as max')->first();
-            return ['min' => (float) ($r->min ?? 0), 'max' => (float) ($r->max ?? 0)];
+        return Cache::remember('book_price_range_v2', 3600, function () {
+            $r = Book::available()
+                ->selectRaw('MIN(price) as min, MAX(price) as max')
+                ->first();
+
+            return [
+                'min' => (float) ($r->min ?? 0),
+                'max' => (float) ($r->max ?? 0),
+            ];
         });
     }
 
     protected function getLanguages()
     {
-        return Cache::remember('book_languages', 3600, function () {
-            return Book::available()->distinct()->pluck('language')->filter()->sort()->values()->toArray();
+        return Cache::remember('book_languages_v2', 3600, function () {
+            return Book::available()
+                ->distinct()
+                ->pluck('language')
+                ->filter()
+                ->sort()
+                ->values()
+                ->toArray();
         });
     }
 }

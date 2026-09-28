@@ -26,6 +26,15 @@ const router = createRouter({
         { path: '/login', name: 'login', component: () => import('@/views/LoginView.vue'), meta: { guestOnly: true } },
         { path: '/register', name: 'register', component: () => import('@/views/RegisterView.vue'), meta: { guestOnly: true } },
 
+        // ============================================
+        // OAUTH CALLBACK — TAMBAH INI
+        // ============================================
+        {
+            path: '/auth/callback',
+            name: 'auth-callback',
+            component: () => import('@/views/AuthCallback.vue'),
+        },
+
         // ADMIN
         {
             path: '/admin',

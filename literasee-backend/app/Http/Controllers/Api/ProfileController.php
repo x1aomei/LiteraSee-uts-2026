@@ -19,6 +19,9 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
+        // ============================================
+        // 1. Handle upload avatar DULU
+        // ============================================
         if ($request->hasFile('avatar')) {
             if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
                 Storage::disk('public')->delete($user->avatar);
@@ -27,9 +30,18 @@ class ProfileController extends Controller
             $user->avatar = $request->file('avatar')->storeAs('avatars', $filename, 'public');
         }
 
-        $user->fill($request->validated());
+        // ============================================
+        // 2. Fill field lain — EXCLUDE 'avatar' ❗
+        //    Sebelumnya: $user->fill($request->validated());
+        //    Bug: 'avatar' object UploadedFile menimpa hasil storeAs()
+        //    Fix: pakai safe()->except('avatar')
+        // ============================================
+        $user->fill($request->safe()->except('avatar'));
 
-        if ($user->isDirty('email')) $user->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
         $user->save();
 
         return $this->successResponse(
@@ -41,10 +53,12 @@ class ProfileController extends Controller
     public function deleteAvatar(Request $request)
     {
         $user = $request->user();
+
         if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
             Storage::disk('public')->delete($user->avatar);
             $user->update(['avatar' => null]);
         }
+
         return $this->successResponse(new UserResource($user->fresh()), 'Foto profil dihapus.');
     }
 
@@ -52,7 +66,7 @@ class ProfileController extends Controller
     {
         $validated = $request->validate([
             'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'confirmed', 'min:8'],
+            'password'         => ['required', 'confirmed', 'min:8'],
         ]);
 
         $request->user()->update(['password' => Hash::make($validated['password'])]);

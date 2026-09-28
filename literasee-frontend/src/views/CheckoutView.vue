@@ -35,7 +35,6 @@ async function fetchPreview() {
 }
 
 async function submitOrder() {
-    // Prevent double submit
     if (submitting.value) return;
     submitting.value = true;
 
@@ -43,21 +42,15 @@ async function submitOrder() {
         const response = await api.post('/checkout', form.value);
         console.log('Checkout response:', response.data);
 
-        // Ambil order ID dari berbagai kemungkinan format
         const root = response.data;
         const orderId = root?.data?.id
             || root?.data?.order?.id
             || root?.id
             || null;
 
-        console.log('Order ID:', orderId);
-
         toast.success('Pesanan berhasil dibuat!');
-
-        // Update cart count
         await cart.fetchSummary();
 
-        // Redirect
         if (orderId) {
             router.push(`/orders/${orderId}`);
         } else {
@@ -65,76 +58,101 @@ async function submitOrder() {
         }
     } catch (e) {
         console.error('Checkout error:', e);
-        console.error('Response:', e.response?.data);
         toast.error(e.response?.data?.message || 'Gagal membuat pesanan');
         submitting.value = false;
     }
-    // Jangan reset submitting kalau sukses — biar gak bisa double click
 }
 
 onMounted(fetchPreview);
 </script>
 
 <template>
-    <div class="max-w-7xl mx-auto px-4 py-8">
-        <h1 class="text-2xl font-bold mb-6">Checkout</h1>
-        <LoadingSpinner v-if="loading" />
+    <!-- Background utama Beige (#F2ECE4) dengan teks Cokelat Soft (#3B2E26) -->
+    <div class="bg-[#F2ECE4] text-[#3B2E26] min-h-screen py-10">
+        <div class="max-w-7xl mx-auto px-4">
+            
+            <!-- Judul Halaman -->
+            <div class="mb-8 pb-4 border-b-2 border-[#D4C5B9]">
+                <h1 class="text-3xl font-black tracking-wide uppercase flex items-center gap-2">
+                    <span>📦</span> Checkout Pesanan
+                </h1>
+                <p class="text-xs font-bold tracking-widest text-[#8C7A6B] mt-1">LENGKAPI INFORMASI PENGIRIMAN BUKU ANDA</p>
+            </div>
 
-        <form v-else-if="preview" @submit.prevent="submitOrder" class="grid lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2">
-                <div class="card p-6">
-                    <h2 class="font-bold text-lg mb-4">Informasi Pengiriman</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Nama Penerima *</label>
-                            <input v-model="form.name" type="text" required class="input" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">No. Telepon *</label>
-                            <input v-model="form.phone" type="tel" required class="input" placeholder="08xxxxxxxxxx" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Alamat Lengkap *</label>
-                            <textarea v-model="form.address" required rows="3" class="input"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Catatan (opsional)</label>
-                            <textarea v-model="form.notes" rows="2" class="input"></textarea>
+            <LoadingSpinner v-if="loading" />
+
+            <form v-else-if="preview" @submit.prevent="submitOrder" class="grid lg:grid-cols-3 gap-8">
+                
+                <!-- Informasi Pengiriman -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white border-2 border-[#D4C5B9] p-6 shadow-sm">
+                        <h2 class="font-black text-base uppercase tracking-wider mb-5 pb-3 border-b-2 border-[#D4C5B9] text-[#3B2E26]">
+                            Informasi Alamat Pengiriman
+                        </h2>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold tracking-widest text-[#5C4A3F] uppercase mb-2">Nama Penerima *</label>
+                                <input v-model="form.name" type="text" required class="w-full bg-[#FAF7F2] border border-[#D4C5B9] text-[#3B2E26] text-sm py-2.5 px-3 focus:outline-none focus:border-[#5C4A3F]" />
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-bold tracking-widest text-[#5C4A3F] uppercase mb-2">No. Telepon / WhatsApp *</label>
+                                <input v-model="form.phone" type="tel" required class="w-full bg-[#FAF7F2] border border-[#D4C5B9] text-[#3B2E26] text-sm py-2.5 px-3 focus:outline-none focus:border-[#5C4A3F]" placeholder="08xxxxxxxxxx" />
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-bold tracking-widest text-[#5C4A3F] uppercase mb-2">Alamat Lengkap *</label>
+                                <textarea v-model="form.address" required rows="3" class="w-full bg-[#FAF7F2] border border-[#D4C5B9] text-[#3B2E26] text-sm py-2.5 px-3 focus:outline-none focus:border-[#5C4A3F]" placeholder="Nama jalan, nomor rumah, RT/RW, kecamatan, kota, kode pos"></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-bold tracking-widest text-[#5C4A3F] uppercase mb-2">Catatan Kurir (Opsional)</label>
+                                <textarea v-model="form.notes" rows="2" class="w-full bg-[#FAF7F2] border border-[#D4C5B9] text-[#3B2E26] text-sm py-2.5 px-3 focus:outline-none focus:border-[#5C4A3F]" placeholder="Contoh: Tolong titip di satpam jika rumah kosong"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="lg:col-span-1">
-                <div class="card p-6 sticky top-20">
-                    <h2 class="font-bold text-lg mb-4">Ringkasan Pesanan</h2>
-                    <div class="space-y-3 max-h-64 overflow-y-auto mb-4">
-                        <div v-for="(item, i) in preview.items" :key="i" class="flex justify-between text-sm">
-                            <span class="text-gray-600">{{ item.book_title }} × {{ item.quantity }}</span>
-                            <span class="font-medium">Rp {{ Number(item.subtotal).toLocaleString('id-ID') }}</span>
+                <!-- Ringkasan Pesanan (Sidebar Kanan) -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white border-2 border-[#D4C5B9] p-6 sticky top-20 shadow-sm">
+                        <h2 class="font-black text-base uppercase tracking-wider mb-4 pb-3 border-b-2 border-[#D4C5B9] text-[#3B2E26]">
+                            Ringkasan Pesanan
+                        </h2>
+                        
+                        <div class="space-y-3 max-h-64 overflow-y-auto mb-4 pr-1">
+                            <div v-for="(item, i) in preview.items" :key="i" class="flex justify-between items-start text-xs border-b border-[#FAF7F2] pb-2">
+                                <span class="text-[#3B2E26] font-medium line-clamp-1 pr-2">{{ item.book_title }} <span class="text-[#8C7A6B]">× {{ item.quantity }}</span></span>
+                                <span class="font-bold text-[#5C4A3F] shrink-0">Rp {{ Number(item.subtotal).toLocaleString('id-ID') }}</span>
+                            </div>
                         </div>
+                        
+                        <hr class="border-[#D4C5B9] my-4" />
+                        
+                        <div class="space-y-2 mb-6 text-xs font-medium">
+                            <div class="flex justify-between text-[#8C7A6B]">
+                                <span>Subtotal Buku</span>
+                                <span class="text-[#3B2E26] font-bold">Rp {{ Number(preview.subtotal).toLocaleString('id-ID') }}</span>
+                            </div>
+                            <div class="flex justify-between text-[#8C7A6B]">
+                                <span>Biaya Pengiriman (Ongkir)</span>
+                                <span class="text-[#3B2E26] font-bold">Rp {{ Number(preview.shipping_cost).toLocaleString('id-ID') }}</span>
+                            </div>
+                            <hr class="border-[#D4C5B9] my-2" />
+                            <div class="flex justify-between items-center text-sm font-black text-[#3B2E26]">
+                                <span class="uppercase tracking-wider">Total Pembayaran</span>
+                                <span class="text-base text-[#5C4A3F]">Rp {{ Number(preview.total).toLocaleString('id-ID') }}</span>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" :disabled="submitting" class="w-full bg-[#5C4A3F] text-white text-xs font-bold tracking-widest uppercase py-3.5 hover:bg-[#3B2E26] transition shadow-sm disabled:opacity-50">
+                            {{ submitting ? 'Memproses Pesanan...' : 'Buat Pesanan Sekarang' }}
+                        </button>
                     </div>
-                    <hr class="my-4" />
-                    <div class="space-y-2 mb-6">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Subtotal</span>
-                            <span>Rp {{ Number(preview.subtotal).toLocaleString('id-ID') }}</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Ongkir</span>
-                            <span>Rp {{ Number(preview.shipping_cost).toLocaleString('id-ID') }}</span>
-                        </div>
-                        <hr />
-                        <div class="flex justify-between font-bold text-lg">
-                            <span>Total</span>
-                            <span class="text-primary-600">Rp {{ Number(preview.total).toLocaleString('id-ID') }}</span>
-                        </div>
-                    </div>
-                    <button type="submit" :disabled="submitting" class="btn-primary w-full py-3">
-                        {{ submitting ? 'Memproses...' : 'Buat Pesanan' }}
-                    </button>
                 </div>
-            </div>
-        </form>
+
+            </form>
+        </div>
     </div>
 </template>

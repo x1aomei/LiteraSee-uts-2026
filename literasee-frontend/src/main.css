@@ -1,7 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
 @theme {
+    /* ============================================
+       WARNA PRIMARY — TETAP SAMA SEPERTI SEBELUMNYA
+       ============================================ */
     --color-primary-50:  #eef2ff;
     --color-primary-100: #e0e7ff;
     --color-primary-200: #c7d2fe;
@@ -12,49 +15,142 @@
     --color-primary-700: #4338ca;
     --color-primary-800: #3730a3;
     --color-primary-900: #312e81;
-    --font-sans: 'Inter', system-ui, sans-serif;
+
+    /* ============================================
+       PALET BRUTALISM TAMBAHAN
+       ============================================ */
+    --color-ink:    #0a0a0a;   /* hitam pekat untuk border */
+    --color-paper:  #f4f1ea;   /* krem kertas untuk background */
+
+    /* ============================================
+       FONT
+       ============================================ */
+    --font-sans:    'Inter', system-ui, sans-serif;
+    --font-display: 'Archivo Black', 'Inter', sans-serif;  /* heading chunky */
+    --font-mono:    'JetBrains Mono', ui-monospace, monospace;
 }
 
 @layer base {
-    body { @apply bg-gray-50 text-gray-900 antialiased; font-family: var(--font-sans); }
-    h1, h2, h3, h4, h5, h6 { @apply font-semibold; }
+    body {
+        @apply text-[#0a0a0a] antialiased;
+        background-color: var(--color-paper);
+        font-family: var(--font-sans);
+    }
+
+    /* Heading jadi super bold + uppercase */
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-display);
+        @apply font-black uppercase tracking-tight;
+    }
+
+    ::selection {
+        @apply bg-primary-600 text-white;
+    }
 }
+
+/* ============================================
+   BUTTONS — BRUTALISM STYLE
+   ============================================ */
 
 @utility btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 font-medium transition-all duration-200;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed;
-}
-@utility btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 font-medium transition-all duration-200;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed bg-primary-600 text-white hover:bg-primary-700 active:scale-95;
-}
-@utility btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 font-medium transition-all duration-200;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 text-gray-700 hover:bg-gray-200 active:scale-95;
-}
-@utility btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 font-medium transition-all duration-200;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed bg-red-600 text-white hover:bg-red-700 active:scale-95;
-}
-@utility btn-outline {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 font-medium transition-all duration-200;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300 bg-white hover:bg-gray-50 active:scale-95;
-}
-@utility input {
-    @apply w-full rounded-lg border border-gray-300 px-3 py-2 transition;
-    @apply focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20;
-}
-@utility card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-100;
-}
-@utility badge {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+    @apply inline-flex items-center justify-center gap-2
+           px-5 py-2.5
+           text-sm font-bold uppercase tracking-wider
+           border-2 border-[#0a0a0a] rounded-none
+           transition-all duration-100 ease-out
+           shadow-[4px_4px_0_0_#0a0a0a]
+           hover:translate-x-[2px] hover:translate-y-[2px]
+           hover:shadow-[2px_2px_0_0_#0a0a0a]
+           active:translate-x-[4px] active:translate-y-[4px]
+           active:shadow-none
+           disabled:opacity-40 disabled:cursor-not-allowed
+           disabled:translate-x-0 disabled:translate-y-0
+           disabled:shadow-[4px_4px_0_0_#0a0a0a];
 }
 
-.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
+@utility btn-primary {
+    @apply btn bg-primary-600 text-white hover:bg-primary-700;
+}
+
+@utility btn-secondary {
+    @apply btn bg-white text-[#0a0a0a] hover:bg-[#e5e5e5];
+}
+
+@utility btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700;
+}
+
+@utility btn-outline {
+    @apply btn bg-transparent text-[#0a0a0a] hover:bg-[#0a0a0a] hover:text-white;
+}
+
+/* ============================================
+   FORM INPUT — BRUTALISM
+   ============================================ */
+
+@utility input {
+    @apply w-full px-4 py-2.5
+           bg-white text-[#0a0a0a]
+           font-medium
+           border-2 border-[#0a0a0a] rounded-none
+           placeholder:text-gray-400
+           transition-all duration-100
+           focus:outline-none
+           focus:translate-x-[-2px] focus:translate-y-[-2px]
+           focus:shadow-[4px_4px_0_0_#4f46e5];
+}
+
+@utility textarea {
+    @apply input resize-y min-h-[100px];
+}
+
+/* ============================================
+   CARD — BRUTALISM
+   ============================================ */
+
+@utility card {
+    @apply bg-white
+           border-2 border-[#0a0a0a] rounded-none
+           shadow-[4px_4px_0_0_#0a0a0a];
+}
+
+@utility card-hover {
+    @apply card
+           transition-all duration-150
+           hover:translate-x-[-3px] hover:translate-y-[-3px]
+           hover:shadow-[7px_7px_0_0_#0a0a0a];
+}
+
+/* ============================================
+   BADGE — BRUTALISM
+   ============================================ */
+
+@utility badge {
+    @apply inline-flex items-center
+           px-2.5 py-0.5
+           text-xs font-bold uppercase tracking-wider
+           border-2 border-[#0a0a0a] rounded-none
+           bg-white;
+}
+
+/* ============================================
+   TRANSlTIONS
+   ============================================ */
+
+.fade-enter-active, .fade-leave-active { transition: opacity 0.15s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
-.slide-up-enter-active { transition: all 0.3s ease; }
+
+.slide-up-enter-active { transition: all 0.2s ease; }
 .slide-up-enter-from { transform: translateY(20px); opacity: 0; }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+/* ============================================
+   SCROLLBAR — BRUTALISM (kotak, tanpa radius)
+   ============================================ */
+
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: var(--color-paper); }
+::-webkit-scrollbar-thumb {
+    background: #0a0a0a;
+    border: 2px solid var(--color-paper);
+}
+::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
